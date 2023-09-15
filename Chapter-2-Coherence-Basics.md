@@ -22,7 +22,7 @@
 
 ## 2.3 Cache Coherence 接口
 
-在非正式情况下，coherence 协议必须确保 writes 对所有处理器都可见。在本节中，我们将通过它们展示的抽象接口来更正式地理解 coherence 协议。
+在非正式情况下，**coherence 协议必须确保 writes 对所有处理器都可见**。在本节中，我们将通过它们展示的抽象接口来更正式地理解 coherence 协议。
 
 处理器核心通过 coherence 接口（图 2.2）与 coherence 协议交互，该接口提供两种方法：(1) *read-request* 方法，接受内存位置作为参数并返回一个值；(2) *write-request* 方法，它接受内存位置和要写入的值作为参数，并返回一个确认 (acknowledgment)。
 
@@ -30,7 +30,7 @@
 
 文献中出现了许多 coherence 协议，并已在实际处理器中使用。我们根据它们的 coherence 接口的性质将这些协议分为两类。具体来说，是基于 consistency model 和 coherence 是否可以清晰地分离，或者它们是否不可分割。
 
-**Consistency-agnostic coherence.** 在第一类中，一个 write 在返回之前对所有其他核心可见。因为 writes 是同步传播的，所以第一类提供了一个与原子内存系统（没有缓存）相同的接口。因此，任何与 coherence 协议交互的子系统，例如处理器核心流水线，都可以假设它正在与不存在缓存的原子内存系统交互。从 consistency 强制实施的角度来看，这种 coherence 接口可以很好地分离关注点。Cache coherence 协议将缓存完全抽象出来并呈现出原子内存的错觉，就好像缓存被移除一样，只有内存包含在 coherence 框内（图 2.2），而处理器核心流水线强制实施 consistency model 规范中的排序。
+**Consistency-agnostic coherence.** 在第一类中，一个 write 在返回之前对所有其他核心可见。因为 <u>writes 是同步传播的</u>，所以第一类提供了一个与原子内存系统（没有缓存）相同的接口。因此，任何与 coherence 协议交互的子系统，例如处理器核心流水线，都可以假设它正在与不存在缓存的原子内存系统交互。从 consistency 强制实施的角度来看，这种 coherence 接口可以很好地分离关注点。Cache coherence 协议将缓存完全抽象出来并呈现出原子内存的错觉，就好像缓存被移除一样，只有内存包含在 coherence 框内（图 2.2），而处理器核心流水线强制实施 consistency model 规范中的排序。
 
 **Consistency-directed coherence.** 在第二类这种较新的类别中，writes 是异步传播的。因此，一个 write 可以在所有处理器可见之前返回，从而允许（实时）观察过时的值。但是，为了正确强制实施 consistency，此类中的 coherence 协议必须确保最终使 writes 可见的顺序符合 consistency model 规定的排序规则。回到图 2.2，流水线和 coherence 协议一起强制实施 consistency model 要求的排序。第二类的出现是为了支持基于吞吐量的通用图形处理单元 (GP-GPUs)，并在本入门指南第一版出版后受到重视。（注1）
 
@@ -74,7 +74,7 @@ Coherence 协议必须满足哪些不变量 (invariants) 才能使缓存不可�
 
 ### 2.4.2 Coherence 的粒度
 
-核心可以以各种粒度呈现 loads 和 stores，通常范围为 1-64 字节。理论上，可以以最精细的 load/store 粒度执行 coherence。然而，在实践中，coherence 通常保持在缓存块的粒度上。也就是说，硬件在逐个缓存块的基础上强制实施 coherence。在实践中，SWMR 不变量很可能是，对于任何内存*块 (block)*，要么有一个 writer，要么有一些 readers。在典型系统中，一个核心不可能写入块的第一个字节，而另一个核心正在写入该块中的另一个字节。尽管缓存块粒度很常见，而且我们在本入门书的其余部分都假设这一点，但应该知道有些协议在更细和更粗的粒度上保持 coherence。
+核心可以以各种粒度呈现 loads 和 stores，通常范围为 1-64 字节。理论上，可以以最精细的 load/store 粒度执行 coherence。然而，在实践中，**coherence 通常保持在缓存块的粒度上**。也就是说，硬件在逐个缓存块的基础上强制实施 coherence。在实践中，SWMR 不变量很可能是，对于任何内存*块 (block)*，要么有一个 writer，要么有一些 readers。在典型系统中，一个核心不可能写入块的第一个字节，而另一个核心正在写入该块中的另一个字节。尽管缓存块粒度很常见，而且我们在本入门书的其余部分都假设这一点，但应该知道有些协议在更细和更粗的粒度上保持 coherence。
 
 ### 2.4.3 Coherence 何时相关？
 
